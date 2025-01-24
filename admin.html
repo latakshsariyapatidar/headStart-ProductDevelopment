@@ -1,129 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel</title>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f4f4f4;
+      }
+      .container {
+        text-align: center;
+        background-color: white;
+        padding: 30px;
+        width: 80%;
+        max-width: 900px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .panel-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+      .panel {
+        width: 48%;
+      }
+      .submit-btn {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+      }
+      .product-list {
+        background-color: #fafafa;
+        padding: 15px;
+        border-radius: 4px;
+        margin-top: 20px;
+        text-align: left;
+      }
+      .product-list div {
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #e0e0e0;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" id="adminPanel" style="display: none;">
+      <h1>Headstart</h1>
+      <h2>Admin Panel</h2>
 
-  <style>
-    /* Add custom styles */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-    }
+      <div class="panel-container">
+        <div class="panel">
+          <h3>Generate User Account</h3>
+          <input type="text" class="input-box" id="newUserEmail" placeholder="Enter user email" />
+          <input type="password" class="input-box" id="newUserPassword" placeholder="Enter password" />
+          <button class="submit-btn" onclick="generateUserAccount()">Create Account</button>
+        </div>
 
-    .container {
-      width: 80%;
-      margin: 0 auto;
-    }
-
-    h1,
-    h2 {
-      text-align: center;
-      color: #333;
-    }
-
-    .panel-container {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 50px;
-    }
-
-    .panel {
-      width: 48%;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .panel h3 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .input-box {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-    }
-
-    .submit-btn {
-      width: 100%;
-      padding: 10px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .submit-btn:hover {
-      background-color: #45a049;
-    }
-
-    .product-list {
-      margin-top: 20px;
-      list-style-type: none;
-      padding: 0;
-    }
-
-    .product-list li {
-      margin: 10px 0;
-      padding: 10px;
-      background-color: #f1f1f1;
-      border-radius: 4px;
-    }
-
-    .product-list li span {
-      font-weight: bold;
-      color: #333;
-    }
-  </style>
-</head>
-
-<body>
-
-  <div class="container" id="adminPanel">
-    <h1>Headstart Admin Panel</h1>
-    <h2>Manage User Accounts and Products</h2>
-
-    <div class="panel-container">
-
-      <!-- User Account Generation Panel -->
-      <div class="panel">
-        <h3>Generate User Account</h3>
-        <input type="text" class="input-box" id="newUserEmail" placeholder="Enter user email" />
-        <input type="password" class="input-box" id="newUserPassword" placeholder="Enter password" />
-        <button class="submit-btn" onclick="generateUserAccount()">Create Account</button>
-      </div>
-
-      <!-- Team and Product Assignment Panel -->
-      <div class="panel">
-        <h3>Team and Product Assignment</h3>
-        <ul id="productList" class="product-list">
-          <!-- List of teams and products will be dynamically inserted here -->
-        </ul>
+        <div class="panel">
+          <h3>Assigned Products to Teams</h3>
+          <div id="productList" class="product-list"></div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Firebase SDK v9+ Imports -->
-  <script type="module">
-    // Import Firebase SDKs
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+      import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+      import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 
-    // Firebase configuration
-    const firebaseConfig = {
+      // Firebase configuration
+      const firebaseConfig = {
         apiKey: "AIzaSyDvTQ0DeAsFtk-VjMe0FVPV4KYO03Uk3lI",
         authDomain: "headstart-product-development.firebaseapp.com",
         projectId: "headstart-product-development",
@@ -132,56 +93,75 @@
         appId: "1:718325388324:web:43009963835dfe0c0374b1"
       };
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
 
-    // Function to generate a user account
-    window.generateUserAccount = function () {
-      const email = document.getElementById("newUserEmail").value;
-      const password = document.getElementById("newUserPassword").value;
+      // Check logged-in user
+      onAuthStateChanged(auth, (user) => {
+        const adminPanel = document.getElementById("adminPanel");
 
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          console.log("User created:", user);
-          alert("User account created successfully!");
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          console.error(`Error creating user: ${errorCode} - ${errorMessage}`);
-          alert(`Error: ${errorMessage}`);
-        });
-    };
-
-    // Function to load team names and assigned products
-    async function loadTeamProducts() {
-      const teamsCollection = collection(db, "products");
-      const teamsSnapshot = await getDocs(teamsCollection);
-      const productListElement = document.getElementById("productList");
-
-      // Clear existing list
-      productListElement.innerHTML = "";
-
-      teamsSnapshot.forEach((doc) => {
-        const productData = doc.data();
-        const teamEmails = productData.team;
-
-        // Loop through team emails
-        teamEmails.forEach((email) => {
-          const teamName = email.split('@')[0]; // Extract team name from email
-          const listItem = document.createElement("li");
-          listItem.innerHTML = `<span>${teamName}</span> : ${productData.product}`;
-          productListElement.appendChild(listItem);
-        });
+        if (user) {
+          const email = user.email;
+          if (email === "admin@admin.com") {
+            adminPanel.style.display = "block";
+            fetchProducts(); // Fetch products when admin is logged in
+          } else {
+            adminPanel.style.display = "none";
+          }
+        } else {
+          window.location.href = "login.html"; // Redirect if not logged in
+        }
       });
-    }
 
-    // Load team products on page load
-    window.onload = loadTeamProducts;
-  </script>
-</body>
+      // Fetch products and display assigned teams
+      async function fetchProducts() {
+        const querySnapshot = await getDocs(collection(db, "Products"));
+        const productListContainer = document.getElementById("productList");
 
+        querySnapshot.forEach((doc) => {
+          const productData = doc.data();
+          const productName = doc.id; // Use document ID as product name
+          const teamEmails = productData.Team;
+
+
+
+          // Create product entry in the list
+          let productHTML = `<h4>${productName}</h4>`;
+
+          teamEmails.forEach((teamEmail) => {
+            console.log(teamEmail);
+            const teamName = teamEmail.split('@')[0]; // Extract team name from email (before '@')
+            
+            productHTML += `<div>Team: ${teamName} - Product Assigned: ${productName}</div>`;
+          });
+
+          productListContainer.innerHTML += productHTML;
+        });
+      }
+
+      // Generate user account
+      window.generateUserAccount = function () {
+        const email = document.getElementById("newUserEmail").value;
+        const password = document.getElementById("newUserPassword").value;
+
+        if (email === "" || password === "") {
+          alert("Please fill in both fields.");
+          return;
+        }
+
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            // Successfully created new user
+            alert("Account successfully created for: " + email);
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            alert("Error: " + errorMessage);
+          });
+      };
+    </script>
+  </body>
 </html>
