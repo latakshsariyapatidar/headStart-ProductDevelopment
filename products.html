@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products Page</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f4f4f4;
+      }
+
+      .container {
+        text-align: center;
+        background-color: white;
+        padding: 30px;
+        width: 80%;
+        max-width: 900px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        font-size: 36px;
+        margin-bottom: 10px;
+      }
+
+      h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      .product-list {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #fafafa;
+        border-radius: 8px;
+        text-align: left;
+      }
+
+      .product-item {
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #e0e0e0;
+        border-radius: 8px;
+      }
+
+      .select-btn {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      .select-btn:hover {
+        background-color: #45a049;
+      }
+
+      /* Popup styling */
+      .popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 30px;
+        border-radius: 8px;
+        z-index: 9999;
+      }
+
+      .popup button {
+        background-color: #f44336;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      .popup button:hover {
+        background-color: #e53935;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Headstart</h1>
+      <div id="content"></div>
+
+      <!-- Popup for confirmation -->
+      <div class="popup" id="confirmationPopup">
+        <p>Are you sure you want to select this product?</p>
+        <button onclick="confirmSelection()">Yes, select this product</button>
+        <button onclick="closePopup()">No, cancel</button>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+      import { getFirestore, collection, getDocs, updateDoc, arrayUnion, doc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyDvTQ0DeAsFtk-VjMe0FVPV4KYO03Uk3lI",
+        authDomain: "headstart-product-development.firebaseapp.com",
+        projectId: "headstart-product-development",
+        storageBucket: "headstart-product-development.appspot.com",
+        messagingSenderId: "718325388324",
+        appId: "1:718325388324:web:43009963835dfe0c0374b1"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
+
+      let selectedProduct = null;
+      let currentTeamEmail = null;
+
+      // Listen for the authentication state
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          currentTeamEmail = user.email;
+
+          // If admin, redirect to admin page
+          if (currentTeamEmail === "admin@admin.com") {
+            window.location.href = "admin.html";
+            return;
+          }
+
+          // Check if a product has already been selected
+          checkSelectedProduct();
+        } else {
+          window.location.href = "login.html";
+        }
+      });
+
+      // Function to check selected products
+      async function checkSelectedProduct() {
+        const productCollection = collection(db, "Products");
+        const productSnapshot = await getDocs(productCollection);
+        let productSelected = false;
+
+        productSnapshot.forEach((doc) => {
+          const productData = doc.data();
+          const teamEmails = productData.Team || [];
+
+          // Check if the team email exists in any product
+          if (teamEmails.includes(currentTeamEmail)) {
+            productSelected = true;
+            const teamName = capitalizeFirstLetter(currentTeamEmail.split("@")[0]);
+            displaySelectedProduct(doc.id, teamName);
+          }
+        });
+
+        // If no product has been selected, show available products
+        if (!productSelected) {
+          displayAvailableProducts(productSnapshot);
+        }
+      }
+
+      // Function to display selected product
+      function displaySelectedProduct(productId, teamName) {
+        const content = document.getElementById("content");
+        content.innerHTML = `
+          <h2>${teamName}'s Product</h2>
+          <p>Product Selected: ${productId}</p>
+        `;
+      }
+
+      // Function to display available products for selection
+      function displayAvailableProducts(productSnapshot) {
+        const content = document.getElementById("content");
+        content.innerHTML = "<h2>Products Page</h2>";
+
+        const productList = document.createElement("div");
+        productList.classList.add("product-list");
+
+        productSnapshot.forEach((doc) => {
+          const productData = doc.data();
+          const productName = doc.id;
+          const teamEmails = productData.Team || [];
+
+          // Only show products that are available (Team array has less than 2 entries)
+          if (teamEmails.length < 2) {
+            const productItem = document.createElement("div");
+            productItem.classList.add("product-item");
+            productItem.innerHTML = `
+              <p>${productName}</p>
+              <button class="select-btn" onclick="selectProduct('${productName}')">Select this product</button>
+            `;
+            productList.appendChild(productItem);
+          }
+        });
+
+        content.appendChild(productList);
+      }
+
+      // Function to trigger the confirmation popup for product selection
+      function selectProduct(productName) {
+        document.getElementById("confirmationPopup").style.display = "block";
+        selectedProduct = productName;
+      }
+
+      window.selectProduct = selectProduct;
+
+      // Function to confirm product selection and update Firestore
+      async function confirmSelection() {
+        if (!selectedProduct) return;
+
+        const productDocRef = doc(db, "Products", selectedProduct);
+
+        // Update the Firestore document by adding the team's email to the Team array
+        await updateDoc(productDocRef, {
+          Team: arrayUnion(currentTeamEmail)
+        });
+
+        alert(`${selectedProduct} has been assigned to your team!`);
+        window.location.reload();
+      }
+
+      window.confirmSelection = confirmSelection;
+
+      // Close the popup without selecting
+      function closePopup() {
+        document.getElementById("confirmationPopup").style.display = "none";
+      }
+
+      window.closePopup = closePopup;
+
+      // Utility function to capitalize the first letter of a string
+      function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+    </script>
+  </body>
+</html>

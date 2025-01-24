@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeadStart - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .login-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            width: 80%;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>HeadStart</h1>
+        <h2>Product Development</h2>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="error-message" style="color:red;"></p>
+    </div>
+
+    <!-- Firebase and Script -->
+    <script type="module">
+        // Import the necessary Firebase modules (v9)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+        // Firebase configuration (use your own keys)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDvTQ0DeAsFtk-VjMe0FVPV4KYO03Uk3lI",
+            authDomain: "headstart-product-development.firebaseapp.com",
+            projectId: "headstart-product-development",
+            storageBucket: "headstart-product-development.appspot.com",
+            messagingSenderId: "718325388324",
+            appId: "1:718325388324:web:43009963835dfe0c0374b1"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Expose login function to the global scope
+        window.login = function login() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const errorMessage = document.getElementById("error-message");
+
+            // Clear any previous error messages
+            errorMessage.textContent = "";
+
+            // Firebase authentication
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Check if the email contains 'admin'
+                    if (email.includes('admin')) {
+                        window.location.href = "admin.html"; // Redirect to admin page
+                    } else {
+                        window.location.href = "products.html"; // Redirect to products page
+                    }
+                })
+                .catch((error) => {
+                    // Display error message
+                    errorMessage.textContent = "Login failed: " + error.message;
+                });
+        }
+    </script>
+
+</body>
+</html>
