@@ -1,222 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Panel</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f4f4f4;
-      }
 
-      /* Admin Panel Container */
-      .container {
-        max-width: 1200px;
-        margin: 20px auto;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel</title>
 
-      /* Header Styles */
-      h1 {
-        text-align: center;
-        font-size: 2.5rem;
-        color: #333;
-        margin-bottom: 10px;
-      }
+  <style>
+    /* Add custom styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
 
-      h2 {
-        text-align: center;
-        font-size: 1.75rem;
-        color: #666;
-        margin-bottom: 30px;
-      }
+    .container {
+      width: 80%;
+      margin: 0 auto;
+    }
 
-      /* Flex Layout for Left and Right Panels */
-      .panel-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-      }
+    h1,
+    h2 {
+      text-align: center;
+      color: #333;
+    }
 
-      /* Left Panel Styles (Email Generator) */
-      .left-panel {
-        background-color: #fafafa;
-        border-radius: 8px;
-        padding: 20px;
-        width: 48%;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-      }
+    .panel-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 50px;
+    }
 
-      /* Right Panel Styles (Product Assignment) */
-      .right-panel {
-        background-color: #fafafa;
-        border-radius: 8px;
-        padding: 20px;
-        width: 48%;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-      }
+    .panel {
+      width: 48%;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
 
-      .panel h3 {
-        font-size: 1.5rem;
-        color: #333;
-        margin-bottom: 15px;
-      }
+    .panel h3 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-      /* Input Boxes */
-      .input-box {
-        padding: 10px;
-        font-size: 1rem;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        margin-bottom: 15px;
-        width: 100%;
-      }
+    .input-box {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
 
-      /* Submit Button */
-      .submit-btn {
-        padding: 10px;
-        font-size: 1rem;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
+    .submit-btn {
+      width: 100%;
+      padding: 10px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
 
-      .submit-btn:hover {
-        background-color: #45a049;
-      }
+    .submit-btn:hover {
+      background-color: #45a049;
+    }
 
-      /* Product List */
-      .product-list {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
+    .product-list {
+      margin-top: 20px;
+      list-style-type: none;
+      padding: 0;
+    }
 
-      .product-list div {
-        padding: 10px;
-        background-color: #f0f0f0;
-        border-radius: 5px;
-        font-size: 1.1rem;
-        color: #333;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
+    .product-list li {
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #f1f1f1;
+      border-radius: 4px;
+    }
 
-      /* Player Message */
-      .player-message {
-        text-align: center;
-        background-color: #ffcc00;
-        padding: 20px;
-        font-size: 1.25rem;
-        color: #333;
-        border-radius: 8px;
-      }
+    .product-list li span {
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
 
-      /* Error Box */
-      .error-box {
-        display: none;
-        position: fixed;
-        top: 20%;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #f8d7da;
-        color: #721c24;
-        padding: 15px;
-        border-radius: 5px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        width: 80%;
-        max-width: 400px;
-        z-index: 1000;
-      }
+<body>
 
-      .error-box button {
-        background-color: #721c24;
-        color: white;
-        border: none;
-        padding: 8px;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
+  <div class="container" id="adminPanel">
+    <h1>Headstart Admin Panel</h1>
+    <h2>Manage User Accounts and Products</h2>
 
-      .error-box button:hover {
-        background-color: #5a1c1c;
-      }
+    <div class="panel-container">
 
-      /* Admin Panel Responsive Design */
-      @media (max-width: 768px) {
-        .panel-container {
-          flex-direction: column;
-          gap: 30px;
-        }
+      <!-- User Account Generation Panel -->
+      <div class="panel">
+        <h3>Generate User Account</h3>
+        <input type="text" class="input-box" id="newUserEmail" placeholder="Enter user email" />
+        <input type="password" class="input-box" id="newUserPassword" placeholder="Enter password" />
+        <button class="submit-btn" onclick="generateUserAccount()">Create Account</button>
+      </div>
 
-        .left-panel,
-        .right-panel {
-          width: 100%;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Admin Panel Container -->
-    <div class="container" id="adminPanel">
-      <h1>Headstart</h1>
-      <h2>Admin Panel</h2>
-
-      <div class="panel-container">
-        <!-- Left Panel - User Account Generation -->
-        <div class="left-panel">
-          <h3>Generate User Account</h3>
-          <input type="text" class="input-box" id="newUserEmail" placeholder="Enter user email" />
-          <input type="password" class="input-box" id="newUserPassword" placeholder="Enter password" />
-          <button class="submit-btn" onclick="generateUserAccount()">Create Account</button>
-        </div>
-
-        <!-- Right Panel - Product Assignment -->
-        <div class="right-panel">
-          <h3>Assigned Products to Teams</h3>
-          <div class="product-list" id="productList">
-            <!-- Product list will be dynamically populated here -->
-          </div>
-        </div>
+      <!-- Team and Product Assignment Panel -->
+      <div class="panel">
+        <h3>Team and Product Assignment</h3>
+        <ul id="productList" class="product-list">
+          <!-- List of teams and products will be dynamically inserted here -->
+        </ul>
       </div>
     </div>
+  </div>
 
-    <!-- Message for Players -->
-    <div class="player-message" id="playerMessage">
-      <p>You are a player, so don't mess with the search bar!</p>
-    </div>
+  <!-- Firebase SDK v9+ Imports -->
+  <script type="module">
+    // Import Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-    <!-- Error Message Box -->
-    <div class="error-box" id="errorBox">
-      <p id="errorMessage">Error message will appear here.</p>
-      <button onclick="closeErrorBox()">Close</button>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
-
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
-      import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
-
-      const firebaseConfig = {
+    // Firebase configuration
+    const firebaseConfig = {
         apiKey: "AIzaSyDvTQ0DeAsFtk-VjMe0FVPV4KYO03Uk3lI",
         authDomain: "headstart-product-development.firebaseapp.com",
         projectId: "headstart-product-development",
@@ -225,94 +132,56 @@
         appId: "1:718325388324:web:43009963835dfe0c0374b1"
       };
 
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-      // Check if the logged-in user is an admin
-      onAuthStateChanged(auth, (user) => {
-        const adminPanel = document.getElementById("adminPanel");
-        const playerMessage = document.getElementById("playerMessage");
+    // Function to generate a user account
+    window.generateUserAccount = function () {
+      const email = document.getElementById("newUserEmail").value;
+      const password = document.getElementById("newUserPassword").value;
 
-        if (user) {
-          const email = user.email;
-          if (email === "admin@admin.com") {
-            adminPanel.style.display = "block";
-            playerMessage.style.display = "none";
-            loadProducts(); // Load products data if admin is logged in
-          } else {
-            adminPanel.style.display = "none";
-            playerMessage.style.display = "block";
-          }
-        } else {
-          // If no user is logged in, redirect to login page or handle accordingly
-          window.location.href = "login.html";
-        }
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log("User created:", user);
+          alert("User account created successfully!");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.error(`Error creating user: ${errorCode} - ${errorMessage}`);
+          alert(`Error: ${errorMessage}`);
+        });
+    };
+
+    // Function to load team names and assigned products
+    async function loadTeamProducts() {
+      const teamsCollection = collection(db, "products");
+      const teamsSnapshot = await getDocs(teamsCollection);
+      const productListElement = document.getElementById("productList");
+
+      // Clear existing list
+      productListElement.innerHTML = "";
+
+      teamsSnapshot.forEach((doc) => {
+        const productData = doc.data();
+        const teamEmails = productData.team;
+
+        // Loop through team emails
+        teamEmails.forEach((email) => {
+          const teamName = email.split('@')[0]; // Extract team name from email
+          const listItem = document.createElement("li");
+          listItem.innerHTML = `<span>${teamName}</span> : ${productData.product}`;
+          productListElement.appendChild(listItem);
+        });
       });
+    }
 
-      // Function to load products and display them with team names
-      async function loadProducts() {
-        try {
-          const productList = document.getElementById("productList");
-          const querySnapshot = await getDocs(collection(db, "Products"));
+    // Load team products on page load
+    window.onload = loadTeamProducts;
+  </script>
+</body>
 
-          querySnapshot.forEach((doc) => {
-            const productData = doc.data();
-            const productName = doc.id; // Product document name is the product name
-
-            // If the product has a "Team" array, check it
-            if (productData.Team && Array.isArray(productData.Team)) {
-              productData.Team.forEach((teamEmail) => {
-                const teamName = teamEmail.split('@')[0].toUpperCase(); // Extract the team name from email
-                const productItem = document.createElement("div");
-                productItem.textContent = `${teamName}: ${productName}`;
-                productList.appendChild(productItem);
-              });
-            }
-          });
-        } catch (error) {
-          console.error("Error loading products:", error);
-        }
-      }
-
-      // Generate user account
-      window.generateUserAccount = function () {
-        const email = document.getElementById("newUserEmail").value;
-        const password = document.getElementById("newUserPassword").value;
-
-        if (email.includes("admin")) {
-          showError("Admin accounts cannot be created.");
-          return;
-        }
-
-        if (email === "" || password === "") {
-          showError("Please fill in both fields.");
-          return;
-        }
-
-        createUserWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            const user = userCredential.user;
-            alert("User account created successfully!");
-            console.log("User created:", user);
-          })
-          .catch((error) => {
-            const errorMessage = error.message;
-            showError("Error: " + errorMessage);
-            console.error(errorMessage);
-          });
-      };
-
-      // Show error message box
-      function showError(message) {
-        document.getElementById("errorMessage").textContent = message;
-        document.getElementById("errorBox").style.display = "block";
-      }
-
-      // Close the error message box
-      function closeErrorBox() {
-        document.getElementById("errorBox").style.display = "none";
-      }
-    </script>
-  </body>
 </html>
