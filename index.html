@@ -3,22 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://gistcdn.githack.com/mfd/09b70eb47474836f25a21660282ce0fd/raw/e06a670afcb2b861ed2ac4a1ef752d062ef6b46b/Gilroy.css">
     <title>HeadStart - Login</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Gilroy';
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f0f0;
+            background-color: #E8F9FF;
+            overflow: hidden;
         }
         .login-container {
-            background-color: white;
+            background-color: #FBFBFB;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            width: 70%;
         }
         input {
             display: block;
@@ -26,26 +29,32 @@
             padding: 10px;
             width: 80%;
             font-size: 16px;
+            font-family: 'Gilroy';
+            font-size: 14px;
         }
         button {
             padding: 10px 20px;
             font-size: 16px;
-            background-color: #007bff;
-            color: white;
+            background-color: #C4D9FF;
+            color: black;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-weight: 600;
+            font-family: 'Gilroy';
+            transition: all 0.1s linear;
         }
         button:hover {
             background-color: #0056b3;
+            color: #E8F9FF;
         }
     </style>
 </head>
 <body>
 
     <div class="login-container">
-        <h1>HeadStart</h1>
-        <h2>Product Development</h2>
+        <h1 style="color: #000000;">HeadStart</h1>
+        <h2 style="color: #000;">Product Development</h2>
         <input type="email" id="email" placeholder="Email">
         <input type="password" id="password" placeholder="Password">
         <button onclick="login()">Login</button>
@@ -54,48 +63,47 @@
 
     <!-- Firebase and Script -->
     <script type="module">
-        // Import the necessary Firebase modules (v9)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-
-        // Firebase configuration (use your own keys)
-        const firebaseConfig = {
-            apiKey: "AIzaSyDvTQ0DeAsFtk-VjMe0FVPV4KYO03Uk3lI",
-            authDomain: "headstart-product-development.firebaseapp.com",
-            projectId: "headstart-product-development",
-            storageBucket: "headstart-product-development.appspot.com",
-            messagingSenderId: "718325388324",
-            appId: "1:718325388324:web:43009963835dfe0c0374b1"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-
-        // Expose login function to the global scope
-        window.login = function login() {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-            const errorMessage = document.getElementById("error-message");
-
-            // Clear any previous error messages
-            errorMessage.textContent = "";
-
-            // Firebase authentication
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    // Check if the email contains 'admin'
-                    if (email.includes('admin')) {
-                        window.location.href = "admin.html"; // Redirect to admin page
-                    } else {
-                        window.location.href = "products.html"; // Redirect to products page
-                    }
-                })
-                .catch((error) => {
-                    // Display error message
-                    errorMessage.textContent = "Login failed: " + error.message;
-                });
-        }
+      // Firebase imports using modular SDK
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+      import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDvTQ0DeAsFtk-VjMe0FVPV4KYO03Uk3lI",
+        authDomain: "headstart-product-development.firebaseapp.com",
+        projectId: "headstart-product-development",
+        storageBucket: "headstart-product-development.appspot.com",
+        messagingSenderId: "718325388324",
+        appId: "1:718325388324:web:43009963835dfe0c0374b1"
+      };
+    
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+    
+      // Function to log in user
+      window.login = function () {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorMessage = document.getElementById('error-message');
+    
+        signInWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            console.log('User logged in:', user);
+    
+            // Redirect logic based on email
+            if (email === "admin@admin.com") {
+              window.location.href = "/admin.html";
+            }  else {
+              window.location.href = "/products.html";
+            }
+          })
+          .catch((error) => {
+            errorMessage.textContent = `Error: ${error.message}`;
+            console.error(`Error logging in: ${error.code} - ${error.message}`);
+          });
+      };
     </script>
 
 </body>

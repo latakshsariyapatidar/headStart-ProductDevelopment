@@ -3,21 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://gistcdn.githack.com/mfd/09b70eb47474836f25a21660282ce0fd/raw/e06a670afcb2b861ed2ac4a1ef752d062ef6b46b/Gilroy.css">
     <title>Admin Panel</title>
 
     <style>
       body {
-        font-family: Arial, sans-serif;
+        font-family: 'Gilroy';
         margin: 0;
-        height: 100vh;
+        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: #f4f4f4;
+        background-color: #E8F9FF;
       }
       .container {
         text-align: center;
-        background-color: white;
+        background-color: #FBFBFB;
         padding: 30px;
         width: 80%;
         max-width: 900px;
@@ -31,23 +32,30 @@
       }
       .panel {
         width: 48%;
+        background-color: #E8F9FF;
+        border-radius: 20px;
+        border: 2px black solid;
+        overflow: hidden;
       }
       .submit-btn {
         background-color: #4caf50;
         color: white;
-        padding: 10px 20px;
+        padding: 7px 25px;
         border: none;
         border-radius: 4px;
         cursor: pointer;
-        font-size: 16px;
+        font-size: 12px;
         margin-top: 10px;
+        font-family: 'Gilroy';
       }
       .product-list {
-        background-color: #fafafa;
+        background-color: #E8F9FF;
         padding: 15px;
         border-radius: 4px;
         margin-top: 20px;
         text-align: left;
+        overflow: auto;
+        height: 20vw;
       }
       .product-list div {
         margin: 10px 0;
@@ -55,18 +63,61 @@
         background-color: #e0e0e0;
         border-radius: 4px;
       }
+      .top-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      .top-buttons button {
+        background-color: red;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        font-family: 'Gilroy';
+        
+      }
+      #showTeamProduct{
+        display: flex;
+        flex-direction: column;
+        font-size: small;
+        line-height: 1px;
+        font-weight: 100;
+        background-color: #FBFBFB;
+      }
+      #inputContainer{
+        display: flex;
+        flex-direction: column;
+        gap: 1vh;
+        padding: 0vw 5vw;
+        width: 70%;
+      }
+
+      #inputContainer input{
+        height:2vw;
+      }
     </style>
   </head>
   <body>
     <div class="container" id="adminPanel" style="display: none;">
-      <h1>Headstart</h1>
+      <div class="top-buttons">
+        <div class="user-email" id="userEmail">User: </div>
+        <button id="logoutButton" onclick="logout()">Log Out</button>
+      </div>
+
+      <h1 style="text-decoration: underline;">Headstart</h1>
       <h2>Admin Panel</h2>
 
       <div class="panel-container">
-        <div class="panel">
+        <div class="panel" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
           <h3>Generate User Account</h3>
-          <input type="text" class="input-box" id="newUserEmail" placeholder="Enter user email" />
-          <input type="password" class="input-box" id="newUserPassword" placeholder="Enter password" />
+          <div id="inputContainer">
+            <input style="width: 100%;" type="text" class="input-box" id="newUserEmail" placeholder="Enter user email" />
+            <input style="width: 100%;" type="password" class="input-box" id="newUserPassword" placeholder="Enter password" />
+          </div>
+          
           <button class="submit-btn" onclick="generateUserAccount()">Create Account</button>
         </div>
 
@@ -81,7 +132,7 @@
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
       import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
-      import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+      import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 
       // Firebase configuration
       const firebaseConfig = {
@@ -97,6 +148,7 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
       const auth = getAuth(app);
+      let currentUserEmail = '';
 
       // Check logged-in user
       onAuthStateChanged(auth, (user) => {
@@ -104,6 +156,10 @@
 
         if (user) {
           const email = user.email;
+          currentUserEmail = email;
+          document.getElementById("userEmail").textContent = `User: ${currentUserEmail}`;
+
+          // Store logged-in user's email
           if (email === "admin@admin.com") {
             adminPanel.style.display = "block";
             fetchProducts(); // Fetch products when admin is logged in
@@ -125,16 +181,14 @@
           const productName = doc.id; // Use document ID as product name
           const teamEmails = productData.Team;
 
-
-
           // Create product entry in the list
           let productHTML = `<h4>${productName}</h4>`;
 
           teamEmails.forEach((teamEmail) => {
-            console.log(teamEmail);
             const teamName = teamEmail.split('@')[0]; // Extract team name from email (before '@')
-            
-            productHTML += `<div>Team: ${teamName} - Product Assigned: ${productName}</div>`;
+            productHTML += `<div id="showTeamProduct">
+              <h3>Team : ${teamName}</h3>
+              <h3>Product Assigned: ${productName}</h3></div>`;
           });
 
           productListContainer.innerHTML += productHTML;
@@ -160,6 +214,22 @@
             const errorCode = error.code;
             const errorMessage = error.message;
             alert("Error: " + errorMessage);
+          });
+      };
+
+      // Show logged-in user email
+      window.showUser = function () {
+        alert("Logged in as: " + currentUserEmail);
+      };
+
+      // Log out and redirect to index.html
+      window.logout = function () {
+        signOut(auth)
+          .then(() => {
+            window.location.href = "index.html"; // Redirect to index.html after logout
+          })
+          .catch((error) => {
+            alert("Error logging out: " + error.message);
           });
       };
     </script>
